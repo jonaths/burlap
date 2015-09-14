@@ -51,6 +51,7 @@ public class Burlap10 {
     StateParser sp;
     RewardFunction rf;
     TerminalFunction tf;
+    TerminalFunction nobudget;
     StateConditionTest goalCondition;
     State initialState;
     DiscreteStateHashFactory hashingFactory;
@@ -84,10 +85,13 @@ public class Burlap10 {
 
         //define the task
         
-//        rf = new UniformCostRF();
+        // rf = new UniformCostRF();
         rf = new UniformCostPlusMinesRF(gwdg);
         
-        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
+        //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
+        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINS));
+        
+        nobudget = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
         
         goalCondition = new TFGoalCondition(tf);
 
