@@ -26,6 +26,7 @@ import burlap.oomdp.core.ObjectClass;
 import burlap.oomdp.core.ObjectInstance;
 import burlap.oomdp.core.PropositionalFunction;
 import burlap.oomdp.core.State;
+import burlap.oomdp.core.TerminalFunction;
 import burlap.oomdp.singleagent.SADomain;
 import java.util.HashMap;
 
@@ -46,25 +47,26 @@ public class MineWorldDomain extends GridWorldDomain {
     public static final String C2 = "c2";
     
     /**
-     * Constant for the name of the coin 2
+     * Constant for the name of the budget status
      */
     public static final String BUDGET = "budget";    
     
     /**
 	 * Constant for the name of the at location propositional function
      */
-    public static final String							PFHASALLCOINS = "hasAllCoins";
+    public static final String  PFHASALLCOINS = "hasAllCoins";
 
     /**
     * Constant for the name of the at location propositional function
     */
-    public static final String							PFNOBUDGET = "noBudget";
+    public static final String  PFNOBUDGET = "noBudget";
     
     public HashMap<String, Integer[]> coins;
     public HashMap<String, Integer[]> mines;
     public int coinVal;
     public int mineVal;
     public int noBudgetVal;
+    public boolean noBudgetTransition;
 
     public int budget;
     public int initBudget;
@@ -72,6 +74,7 @@ public class MineWorldDomain extends GridWorldDomain {
     public MineWorldDomain(int width, int height) {
         super(width, height);
         this.initBudget = 20;
+        this.noBudgetTransition = false;
         
     }
 
@@ -80,7 +83,7 @@ public class MineWorldDomain extends GridWorldDomain {
 
         Domain domain = new SADomain();
         
-        
+
 
         //Creates a new Attribute object
         Attribute xatt = new Attribute(domain, ATTX, Attribute.AttributeType.INT);
@@ -125,7 +128,7 @@ public class MineWorldDomain extends GridWorldDomain {
 
         new AtLocationPF(PFATLOCATION, domain, new String[]{CLASSAGENT, CLASSLOCATION});
         new HasAllCoinsPF(PFHASALLCOINS, domain, new String[]{CLASSAGENT, CLASSLOCATION});
-        new HasAllCoinsPF(PFNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
+        new NoBudgetPF(PFNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
         
         new WallToPF(PFWALLNORTH, domain, new String[]{CLASSAGENT}, 0);
         new WallToPF(PFWALLSOUTH, domain, new String[]{CLASSAGENT}, 1);
@@ -151,6 +154,9 @@ public class MineWorldDomain extends GridWorldDomain {
         // Set coins initial state
         o.setValue(C1, 0);
         o.setValue(C2, 0);
+        // TO-DO:   este numero debería ajustarse en funcion del 
+        //          la cantidad inicial
+        o.setValue(BUDGET, 2);
     }
 
     /**
@@ -175,6 +181,7 @@ public class MineWorldDomain extends GridWorldDomain {
      * Will set the map of the world to no walls and 2 mines and two coins
      */
     public void setMapToTwoCoinsAndTwoMines() {
+        
         this.width = 11;
         this.height = 11;
         this.makeEmptyMap();
@@ -182,7 +189,7 @@ public class MineWorldDomain extends GridWorldDomain {
         this.coins = new HashMap<>();
         this.mines = new HashMap<>();
 
-        Integer[] coinCoordinates1 = {1, 2};
+        Integer[] coinCoordinates1 = {7, 2};
         Integer[] coinCoordinates2 = {3, 3};
 
         Integer[] mineCoordinates1 = {5, 5};
@@ -234,36 +241,47 @@ public class MineWorldDomain extends GridWorldDomain {
         // Verifica si encontró una moneda
         for (String m : coinCoordinates.keySet()) {
             if (coinCoordinates.get(m)[0] == nx && coinCoordinates.get(m)[1] == ny) {
-                System.out.println("Found coin: " + m + " at " + nx + "," + ny);
+                //System.out.println("Found coin: " + m + " at " + nx + "," + ny);
                 agent.setValue(m, 1);
-                System.out.println(agent.getObjectDescription());
+                //System.out.println(agent.getObjectDescription());
             }
         }
 
-        System.out.println("Budget: " + this.getBudget());
+        //System.out.println("MineWorldDomain::move. budget: " + this.getBudget());
     }
     
     public void updateBudgetState(State s){
         ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
-        //System.out.println(agent.getObjectDescription());
         
+        int budgetStateBefore = agent.getIntValForAttribute(BUDGET);
+        //System.out.println("MineWorldDomain::updateBudgetState. before update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
+        
+        agent.setValue(BUDGET, this.calculateBudgetState());
+        
+        int budgetStateAfter = agent.getIntValForAttribute(BUDGET);
+        //System.out.println("MineWorldDomain::updateBudgetState. after update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
+        
+        if( (budgetStateBefore == 1) && (budgetStateAfter == 0) ){
+            //System.out.println("MineWorldDomain::updateBudgetState. No budget transition!!! ");
+            this.noBudgetTransition = true;
+        }
+    }
+    
+    public int calculateBudgetState(){
         
         int budgetVal = this.budget;
         int budgetState = 0;
-        
+
         if(budgetVal > 0 && budgetVal <= 10){
-            budgetState = 1;
-        }
+                budgetState = 1;
+            }
         if(budgetVal > 10 && budgetVal <=20){
-            budgetState = 2;
-        }
+                budgetState = 2;
+            }
         if(budgetVal > 20 ){
-            budgetState = 3;
-        }
-        
-        agent.setValue(BUDGET, budgetState);
-        //System.out.println(this.budget);
-        //System.out.println(agent.getObjectDescription());
+                budgetState = 3;
+            }   
+        return budgetState;
     }
 
     public HashMap<String, Integer[]> getCoinCoordinates() {
@@ -288,6 +306,10 @@ public class MineWorldDomain extends GridWorldDomain {
 
     public int getBudget() {
         return this.budget;
+    }
+    
+    public boolean getNoBudgetTransition(){
+        return this.noBudgetTransition;
     }
 
     public int getCoinVal() {
@@ -344,14 +366,15 @@ public class MineWorldDomain extends GridWorldDomain {
 
         @Override
         public boolean isTrue(State st, String[] params) {
+              
 
             ObjectInstance agent = st.getObject(params[0]);
             
             int budgs = agent.getIntValForAttribute("budget");
-            System.out.println(budgs);
+            //System.out.println(budgs);
             
             if(budgs == 0){
-                System.out.println("no hay presupuesto");
+                //System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx");
                 return true;
             }
             
@@ -359,5 +382,30 @@ public class MineWorldDomain extends GridWorldDomain {
         }
 
     }    
+    
+    public static class NoBudgetPFTF implements TerminalFunction {
+
+	PropositionalFunction			pf;
+	boolean                         	terminateOnTrue;
+	
+	/**
+	 * Initializes the propositional function that will cause the state to be terminal when any Grounded version of
+	 * pf is true.
+	 * @param pf the propositional function that must have a true grounded version for the state to be terminal.
+	 */
+	public NoBudgetPFTF(PropositionalFunction pf){
+		this.pf = pf;
+		terminateOnTrue = true;
+	}
+	
+	@Override
+	public boolean isTerminal(State s) {
+		System.out.println("aaa");
+                //aqui voy... porque no lo evalua
+                System.exit(0);
+		return true;
+	}
+
+}
 
 }

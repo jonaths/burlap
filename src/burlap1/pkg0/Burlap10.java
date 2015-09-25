@@ -6,6 +6,7 @@
 package burlap1.pkg0;
 
 import burlap.MineWorldDomain;
+import burlap.MineWorldDomain.NoBudgetPFTF;
 import java.awt.Color;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class Burlap10 {
     StateParser sp;
     RewardFunction rf;
     TerminalFunction tf;
-    TerminalFunction nobudget;
+    TerminalFunction nobudgetTF;
     StateConditionTest goalCondition;
     State initialState;
     DiscreteStateHashFactory hashingFactory;
@@ -91,9 +92,9 @@ public class Burlap10 {
         //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
         tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINS));
         
-        nobudget = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
+        nobudgetTF = new NoBudgetPFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
         
-        goalCondition = new TFGoalCondition(tf);
+        goalCondition = new TFGoalCondition(nobudgetTF);
 
         //set up the initial state of the task
         initialState = MineWorldDomain.getOneAgentOneLocationState(domain);
@@ -226,7 +227,7 @@ public class Burlap10 {
 
         if (!outputPath.endsWith("/")) {
             outputPath = outputPath + "/";
-        }
+        } 
 
         //discount= 0.99; initialQ=0.0; learning rate=0.9
         LearningAgent agent = new QLearning(domain, rf, tf, 0.99, hashingFactory, 0., 0.9);
@@ -235,7 +236,7 @@ public class Burlap10 {
         for (int i = 0; i < 100; i++) {
             EpisodeAnalysis ea = agent.runLearningEpisodeFrom(initialState);
             ea.writeToFile(String.format("%se%03d", outputPath, i), sp);
-            System.out.println(i + ": " + ea.numTimeSteps());
+            System.out.println("STEPS " + i + " "  + ea.numTimeSteps() + " " + gwdg.calculateBudgetState());
         }
 
     }

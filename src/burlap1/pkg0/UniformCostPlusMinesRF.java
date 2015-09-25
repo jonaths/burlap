@@ -35,8 +35,8 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         int mineReward = this.domain.getMineVal();
         int noBudgetReward = this.domain.getNoBudgetVal();
         
-        System.out.println("s: " + s.getCompleteStateDescription());
-        System.out.println("sprime: " + sprime.getCompleteStateDescription());
+        //System.out.println("s: " + s.getCompleteStateDescription());
+        //System.out.println("sprime: " + sprime.getCompleteStateDescription());
         
         boolean c1 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
         boolean c2 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
@@ -46,22 +46,23 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         boolean c2p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
         int budgsp = sprime.getFirstObjectOfClass("agent").getIntValForAttribute("budget");
         
-        //System.out.println(c1 + " " + c2 + " " + c1p + " " + c2p);
+        //System.out.println(budgs + " " + budgsp);
 
+//        if(budgsp == 0){
+//            System.exit(0);
+//        }
+        
         //System.out.println("Reward at: " + x + ", " + y);
         
-        //System.out.println("Verify coins: ");
-        
-        System.out.println("Estado final: " + budgs + " " + budgsp);
-        if( budgsp == 0 && budgs == 1 ){
-            System.out.println("AAA");
-            System.exit(0);
+        if( this.domain.getNoBudgetTransition() ){
+            this.domain.noBudgetTransition = false;
             return noBudgetReward;
         }
         
         // Si hubo un cambio en las monedas
+        //System.out.println("Verify coins: ");
         if((c1 ^ c1p) || (c2 ^ c2p)){
-            System.out.println("Coin found... " + x + "," + y + " " + mineReward);
+            //System.out.println("Coin found... " + x + "," + y + " " + mineReward);
             domain.updateBudget(coinReward, sprime);
             // Si se han encontrado las dos monedas resetea el budget
             if( c1p && c2p ){
@@ -75,11 +76,14 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         //System.out.println("Verify mines: ");
         for (String m : mineCoordinates.keySet()) {
             if (mineCoordinates.get(m)[0] == x && mineCoordinates.get(m)[1] == y) {
-                System.out.println("Mine found... " + x + "," + y + " " + mineReward);
+                //System.out.println("Mine found... " + x + "," + y + " " + mineReward);
                 domain.updateBudget(mineReward, sprime);
                 return mineReward;
             }
         }
+        
+        
+        
         domain.updateBudget(-1, sprime);
         return -1;
     }
