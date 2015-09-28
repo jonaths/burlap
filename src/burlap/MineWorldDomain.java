@@ -384,7 +384,7 @@ public class MineWorldDomain extends GridWorldDomain {
 //
 //    }    
     
-    public static class NoBudgetPFTF implements TerminalFunction {
+    public static class NoBudgetTF implements TerminalFunction {
 
 	boolean                         	b;
 	
@@ -393,7 +393,7 @@ public class MineWorldDomain extends GridWorldDomain {
 	 * pf is true.
 	 * @param pf the propositional function that must have a true grounded version for the state to be terminal.
 	 */
-	public NoBudgetPFTF(boolean b){
+	public NoBudgetTF(boolean b){
 		this.b = b;
                 System.out.println("Constructor... ");
 	}

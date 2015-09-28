@@ -6,7 +6,7 @@
 package burlap1.pkg0;
 
 import burlap.MineWorldDomain;
-import burlap.MineWorldDomain.NoBudgetPFTF;
+import burlap.MineWorldDomain.NoBudgetTF;
 import java.awt.Color;
 import java.util.List;
 
@@ -85,7 +85,7 @@ public class Burlap10 {
         //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
         tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINS));
         
-        TerminalFunction tf = new NoBudgetPFTF(true);
+        TerminalFunction tf = new NoBudgetTF(true);
         
         //nobudgetTF = new NoBudgetPFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
         
