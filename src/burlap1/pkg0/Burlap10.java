@@ -85,7 +85,7 @@ public class Burlap10 {
         //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
         tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINS));
         
-        TerminalFunction tf = new NoBudgetTF(true);
+        TerminalFunction tff = new NoBudgetTF(true);
         
         //nobudgetTF = new NoBudgetPFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
         
