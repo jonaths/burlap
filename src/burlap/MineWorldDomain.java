@@ -128,7 +128,7 @@ public class MineWorldDomain extends GridWorldDomain {
 
         new AtLocationPF(PFATLOCATION, domain, new String[]{CLASSAGENT, CLASSLOCATION});
         new HasAllCoinsPF(PFHASALLCOINS, domain, new String[]{CLASSAGENT, CLASSLOCATION});
-        new NoBudgetPF(PFNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
+//        new NoBudgetPF(PFNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
         
         new WallToPF(PFWALLNORTH, domain, new String[]{CLASSAGENT}, 0);
         new WallToPF(PFWALLSOUTH, domain, new String[]{CLASSAGENT}, 1);
@@ -351,59 +351,57 @@ public class MineWorldDomain extends GridWorldDomain {
 
     }
     
-    public class NoBudgetPF extends PropositionalFunction {
-
-        /**
-         * Initializes with given name domain and parameter object class types
-         *
-         * @param name name of function
-         * @param domain the domain of the function
-         * @param parameterClasses the object class types for the parameters
-         */
-        public NoBudgetPF(String name, Domain domain, String[] parameterClasses) {
-            super(name, domain, parameterClasses);
-        }
-
-        @Override
-        public boolean isTrue(State st, String[] params) {
-              
-
-            ObjectInstance agent = st.getObject(params[0]);
-            
-            int budgs = agent.getIntValForAttribute("budget");
-            //System.out.println(budgs);
-            
-            if(budgs == 0){
-                //System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxx");
-                return true;
-            }
-            
-            return false;
-        }
-
-    }    
+//    public class NoBudgetPF extends PropositionalFunction {
+//
+//        /**
+//         * Initializes with given name domain and parameter object class types
+//         *
+//         * @param name name of function
+//         * @param domain the domain of the function
+//         * @param parameterClasses the object class types for the parameters
+//         */
+//        public NoBudgetPF(String name, Domain domain, String[] parameterClasses) {
+//            super(name, domain, parameterClasses);
+//        }
+//
+//        @Override
+//        public boolean isTrue(State st, String[] params) {
+//              
+//
+//            ObjectInstance agent = st.getObject(params[0]);
+//            
+//            int budgs = agent.getIntValForAttribute("budget");
+//            System.out.println("MineWorldDomain::NoBudgetPF. Budget State: "+budgs);
+//            
+//            if(budgs == 0){
+//                //System.out.println("MineWorldDomain::NoBudgetPF. NO BUDGET...");
+//                //System.exit(0);
+//                return true;
+//            }
+//            
+//            return false;
+//        }
+//
+//    }    
     
     public static class NoBudgetPFTF implements TerminalFunction {
 
-	PropositionalFunction			pf;
-	boolean                         	terminateOnTrue;
+	boolean                         	b;
 	
 	/**
 	 * Initializes the propositional function that will cause the state to be terminal when any Grounded version of
 	 * pf is true.
 	 * @param pf the propositional function that must have a true grounded version for the state to be terminal.
 	 */
-	public NoBudgetPFTF(PropositionalFunction pf){
-		this.pf = pf;
-		terminateOnTrue = true;
+	public NoBudgetPFTF(boolean b){
+		this.b = b;
+                System.out.println("Constructor... ");
 	}
 	
 	@Override
 	public boolean isTerminal(State s) {
 		System.out.println("aaa");
-                //aqui voy... porque no lo evalua
-                System.exit(0);
-		return true;
+                return true;
 	}
 
 }
