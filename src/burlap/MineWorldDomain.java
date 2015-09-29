@@ -39,7 +39,8 @@ public class MineWorldDomain extends GridWorldDomain {
     public static final String C2 = "c2";
     public static final String NB = "nobudget";
     public static final String BUDGETSTATE = "budgetstate";
-
+    public static final String  PFHASALLCOINSORNOBUDGET = "hasAllCoinsOrNoBudget";
+    
     public HashMap<String, Integer[]> mines;
     public HashMap<String, Integer[]> coins;
     public int coinVal;
@@ -318,15 +319,15 @@ public class HasAllCoinsOrNoBudgetPF extends PropositionalFunction {
             
             boolean c1 = agent.getBooleanValForAttribute("c1");
             boolean c2 = agent.getBooleanValForAttribute("c2");
-            int budgs = agent.getIntValForAttribute("budget");
+            boolean nb = agent.getBooleanValForAttribute(NB);
             
 //            System.out.println(c1 + " " + c2 + " " + (budgs == 0));
 //            System.out.println(c1 && c2);
 //            System.out.println(budgs == 0);
 //            System.exit(0);
 
-            if((c1 && c2) || (budgs == 0)){
-                System.out.println("HasAllCoinsPF::isTrue. Coins: "+(c1 && c2)+" Budgs: "+(budgs == 0)+" Ending... ");
+            if((c1 && c2) || nb){
+                System.out.println("HasAllCoinsPF::isTrue. coins: " + (c1 && c2)+", nb: " + nb + " Ending... ");
                 return true;
             }
             return false;

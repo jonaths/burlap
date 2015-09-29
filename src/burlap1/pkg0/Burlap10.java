@@ -71,8 +71,8 @@ public class Burlap10 {
 //         rf = new UniformCostRF();
         rf = new UniformCostPlusMinesRF(gwdg);
         
-        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
-//        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINSORNOBUDGET));
+//        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
+        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINSORNOBUDGET));
         
         goalCondition = new TFGoalCondition(tf);
 
