@@ -36,10 +36,11 @@ public class MineWorldDomain extends GridWorldDomain {
 
     public static final String C1 = "c1";
     public static final String C2 = "c2";
+    public static final String NB = "nobudget";
     public static final String BUDGETSTATE = "budgetstate";
-    
-    public HashMap<String,Integer[]> mines;
-    public HashMap<String,Integer[]> coins;
+
+    public HashMap<String, Integer[]> mines;
+    public HashMap<String, Integer[]> coins;
     public int coinVal;
     public int mineVal;
     public int budget;
@@ -62,8 +63,9 @@ public class MineWorldDomain extends GridWorldDomain {
 
         Attribute c1 = new Attribute(domain, C1, Attribute.AttributeType.BOOLEAN);
         Attribute c2 = new Attribute(domain, C2, Attribute.AttributeType.BOOLEAN);
+        Attribute nb = new Attribute(domain, NB, Attribute.AttributeType.BOOLEAN);
         Attribute budgetstate = new Attribute(domain, BUDGETSTATE, Attribute.AttributeType.INT);
-        budgetstate.setLims(0,3);
+        budgetstate.setLims(0, 3);
 
         Attribute ltatt = new Attribute(domain, ATTLOCTYPE, Attribute.AttributeType.DISC);
         ltatt.setDiscValuesForRange(0, numLocationTypes - 1, 1);
@@ -74,6 +76,7 @@ public class MineWorldDomain extends GridWorldDomain {
         agentClass.addAttribute(yatt);
         agentClass.addAttribute(c1);
         agentClass.addAttribute(c2);
+        agentClass.addAttribute(nb);
         agentClass.addAttribute(budgetstate);
 
         // Create locationClass and assign attributes
@@ -83,7 +86,7 @@ public class MineWorldDomain extends GridWorldDomain {
         locationClass.addAttribute(ltatt);
 
         this.budget = 0;
-        
+
         int[][] cmap = this.getMap();
 
         new MovementAction(ACTIONNORTH, domain, this.transitionDynamics[0], cmap);
@@ -115,10 +118,11 @@ public class MineWorldDomain extends GridWorldDomain {
         o.setValue(ATTX, x);
         o.setValue(ATTY, y);
         o.setValue(C1, 0);
-        o.setValue(C2, 0);  
-        setBudgetState(o,budget);
+        o.setValue(C2, 0);
+        o.setValue(NB, 0);
+        setBudgetState(o, budget);
         this.budget = budget;
-        
+
         //System.out.println(o.getObjectDescription());
     }
 
@@ -138,48 +142,50 @@ public class MineWorldDomain extends GridWorldDomain {
         o.setValue(ATTY, y);
         o.setValue(ATTLOCTYPE, 0);
     }
-    
+
     /**
      * Calcula nuevo state budget usando setBudget
+     *
      * @param s
      * @param i
      * @param budget
-     * @return 
+     * @return
      */
-    public int setBudgetState(State s, int i, int budget){
+    public int setBudgetState(State s, int i, int budget) {
         ObjectInstance o = s.getObjectsOfClass(CLASSLOCATION).get(i);
-        return setBudgetState(o,budget);
-        
+        return setBudgetState(o, budget);
+
     }
-    
+
     /**
      * Calcula nuevo state budget
+     *
      * @param o
      * @param budget
-     * @return 
+     * @return
      */
-    public int setBudgetState(ObjectInstance o,int budget){
-        o.setValue(BUDGETSTATE,calculateBudgetState(budget));
+    public int setBudgetState(ObjectInstance o, int budget) {
+        o.setValue(BUDGETSTATE, calculateBudgetState(budget));
         return o.getDiscValForAttribute(BUDGETSTATE);
     }
-    
-    
+
     /**
      * Calcula el budget state en funcion del budget
+     *
      * @param budget
-     * @return 
+     * @return
      */
-    public int calculateBudgetState(int budget){
-        if(budget <= 0){
+    public int calculateBudgetState(int budget) {
+        if (budget <= 0) {
             return 0;
         }
-        if(budget > 0 && budget <= 10){
+        if (budget > 0 && budget <= 10) {
             return 1;
         }
-        if(budget > 10 && budget <= 20){
+        if (budget > 10 && budget <= 20) {
             return 2;
         }
-        if(budget > 20){
+        if (budget > 20) {
             return 3;
         }
         // Si es cualquier otro número regresa -1 (error)
@@ -193,47 +199,99 @@ public class MineWorldDomain extends GridWorldDomain {
         this.width = 11;
         this.height = 11;
         this.makeEmptyMap();
-        
+
         this.coins = new HashMap<>();
         this.mines = new HashMap<>();
-        
-        Integer[] coinCoordinates1 = {1,2};
-        Integer[] coinCoordinates2 = {3,3};
-        
-        Integer[] mineCoordinates1 = {5,5};
-        Integer[] mineCoordinates2 = {7,7};
-        
-        this.coins.put(C1,coinCoordinates1);
-        this.coins.put(C2,coinCoordinates2);
-        
-        this.mines.put("m1",mineCoordinates1);
-        this.mines.put("m2",mineCoordinates2);
-        
+
+        Integer[] coinCoordinates1 = {1, 2};
+        Integer[] coinCoordinates2 = {3, 3};
+
+        Integer[] mineCoordinates1 = {5, 5};
+        Integer[] mineCoordinates2 = {7, 7};
+
+        this.coins.put(C1, coinCoordinates1);
+        this.coins.put(C2, coinCoordinates2);
+
+        this.mines.put("m1", mineCoordinates1);
+        this.mines.put("m2", mineCoordinates2);
+
         this.coinVal = 10;
         this.mineVal = -5;
     }
-    
-    public HashMap<String,Integer[]> getCoinCoordinates(){
+
+    /**
+     * Attempts to move the agent into the given position, taking into account
+     * walls and blocks
+     *
+     * @param s the current state
+     * @param xd the attempted new X position of the agent
+     * @param yd the attempted new Y position of the agent
+     */
+    protected void move(State s, int xd, int yd, int[][] map) {
+
+        boolean foundCoinFlag = false;
+        boolean noBudgetFlag = false;
+
+        ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
+        int ax = agent.getIntValForAttribute(ATTX);
+        int ay = agent.getIntValForAttribute(ATTY);
+
+        int nx = ax + xd;
+        int ny = ay + yd;
+
+        //hit wall, so do not change position
+        if (nx < 0 || nx >= map.length || ny < 0 || ny >= map[0].length || map[nx][ny] == 1
+                || (xd > 0 && (map[ax][ay] == 3 || map[ax][ay] == 4)) || (xd < 0 && (map[nx][ny] == 3 || map[nx][ny] == 4))
+                || (yd > 0 && (map[ax][ay] == 2 || map[ax][ay] == 4)) || (yd < 0 && (map[nx][ny] == 2 || map[nx][ny] == 4))) {
+            nx = ax;
+            ny = ay;
+        }
+
+        agent.setValue(ATTX, nx);
+        agent.setValue(ATTY, ny);
+
+        HashMap<String, Integer[]> coinCoordinates = this.getCoinCoordinates();
+
+        // Verifica si encontró una moneda
+        for (String m : coinCoordinates.keySet()) {
+            if (coinCoordinates.get(m)[0] == nx && coinCoordinates.get(m)[1] == ny) {
+                //System.out.println("Found coin: " + m + " at " + nx + "," + ny);
+                foundCoinFlag = true;
+                agent.setValue(m, 1);
+                //System.out.println(agent.getObjectDescription());
+            }
+        }
+
+        // Verifica si se va a quedar sin presupuesto
+        if (foundCoinFlag && (this.getBudget() + this.getCoinVal()) >= 0) {
+            noBudgetFlag = false;
+        } else if ((this.getCoinVal() - 1) <= 0) {
+            noBudgetFlag = true;
+            agent.setValue(NB, 1);
+        }
+    }
+
+    public HashMap<String, Integer[]> getCoinCoordinates() {
         return this.coins;
     }
-    
-    public HashMap<String,Integer[]> getMineCoordinates(){
+
+    public HashMap<String, Integer[]> getMineCoordinates() {
         return this.mines;
     }
-    
-    public int getCoinVal(){
+
+    public int getCoinVal() {
         return this.coinVal;
     }
-    
-    public int getMineVal(){
+
+    public int getMineVal() {
         return this.mineVal;
     }
-    
-    public int getBudget(){
+
+    public int getBudget() {
         return this.budget;
     }
-    
-    public int updateBudget(int update){
+
+    public int updateBudget(int update) {
         this.budget += update;
         return this.budget;
     }
