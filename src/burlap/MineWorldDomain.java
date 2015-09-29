@@ -54,12 +54,7 @@ public class MineWorldDomain extends GridWorldDomain {
     /**
 	 * Constant for the name of the at location propositional function
      */
-    public static final String  PFHASALLCOINS = "hasAllCoins";
-
-    /**
-    * Constant for the name of the at location propositional function
-    */
-    public static final String  PFNOBUDGET = "noBudget";
+    public static final String  PFHASALLCOINSORNOBUDGET = "hasAllCoinsOrNoBudget";
     
     public HashMap<String, Integer[]> coins;
     public HashMap<String, Integer[]> mines;
@@ -127,8 +122,7 @@ public class MineWorldDomain extends GridWorldDomain {
         new MovementAction(ACTIONWEST, domain, this.transitionDynamics[3], cmap);
 
         new AtLocationPF(PFATLOCATION, domain, new String[]{CLASSAGENT, CLASSLOCATION});
-        new HasAllCoinsPF(PFHASALLCOINS, domain, new String[]{CLASSAGENT, CLASSLOCATION});
-//        new NoBudgetPF(PFNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
+        new HasAllCoinsPF(PFHASALLCOINSORNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
         
         new WallToPF(PFWALLNORTH, domain, new String[]{CLASSAGENT}, 0);
         new WallToPF(PFWALLSOUTH, domain, new String[]{CLASSAGENT}, 1);
@@ -254,15 +248,15 @@ public class MineWorldDomain extends GridWorldDomain {
         ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
         
         int budgetStateBefore = agent.getIntValForAttribute(BUDGET);
-        //System.out.println("MineWorldDomain::updateBudgetState. before update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
+        System.out.println("MineWorldDomain::updateBudgetState. before update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
         
         agent.setValue(BUDGET, this.calculateBudgetState());
         
         int budgetStateAfter = agent.getIntValForAttribute(BUDGET);
-        //System.out.println("MineWorldDomain::updateBudgetState. after update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
+        System.out.println("MineWorldDomain::updateBudgetState. after update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
         
         if( (budgetStateBefore == 1) && (budgetStateAfter == 0) ){
-            //System.out.println("MineWorldDomain::updateBudgetState. No budget transition!!! ");
+            System.out.println("MineWorldDomain::updateBudgetState. No budget transition!!! ");
             this.noBudgetTransition = true;
         }
     }
@@ -270,6 +264,7 @@ public class MineWorldDomain extends GridWorldDomain {
     public int calculateBudgetState(){
         
         int budgetVal = this.budget;
+        System.out.println("MineWorldDomain::calculateBudgetState. Budget: "+budgetVal);
         int budgetState = 0;
 
         if(budgetVal > 0 && budgetVal <= 10){
@@ -344,66 +339,21 @@ public class MineWorldDomain extends GridWorldDomain {
             
             boolean c1 = agent.getBooleanValForAttribute("c1");
             boolean c2 = agent.getBooleanValForAttribute("c2");
+            int budgs = agent.getIntValForAttribute("budget");
             
+//            System.out.println(c1 + " " + c2 + " " + (budgs == 0));
+//            System.out.println(c1 && c2);
+//            System.out.println(budgs == 0);
+//            System.exit(0);
 
-            return c1 && c2;
+            if((c1 && c2) || (budgs == 0)){
+                System.out.println("HasAllCoinsPF::isTrue. Coins: "+(c1 && c2)+" Budgs: "+(budgs == 0)+" Ending... ");
+                return true;
+            }
+            return false;
         }
 
     }
     
-//    public class NoBudgetPF extends PropositionalFunction {
-//
-//        /**
-//         * Initializes with given name domain and parameter object class types
-//         *
-//         * @param name name of function
-//         * @param domain the domain of the function
-//         * @param parameterClasses the object class types for the parameters
-//         */
-//        public NoBudgetPF(String name, Domain domain, String[] parameterClasses) {
-//            super(name, domain, parameterClasses);
-//        }
-//
-//        @Override
-//        public boolean isTrue(State st, String[] params) {
-//              
-//
-//            ObjectInstance agent = st.getObject(params[0]);
-//            
-//            int budgs = agent.getIntValForAttribute("budget");
-//            System.out.println("MineWorldDomain::NoBudgetPF. Budget State: "+budgs);
-//            
-//            if(budgs == 0){
-//                //System.out.println("MineWorldDomain::NoBudgetPF. NO BUDGET...");
-//                //System.exit(0);
-//                return true;
-//            }
-//            
-//            return false;
-//        }
-//
-//    }    
-    
-    public static class NoBudgetTF implements TerminalFunction {
-
-	boolean                         	b;
-	
-	/**
-	 * Initializes the propositional function that will cause the state to be terminal when any Grounded version of
-	 * pf is true.
-	 * @param pf the propositional function that must have a true grounded version for the state to be terminal.
-	 */
-	public NoBudgetTF(boolean b){
-		this.b = b;
-                System.out.println("Constructor... ");
-	}
-	
-	@Override
-	public boolean isTerminal(State s) {
-		System.out.println("aaa");
-                return true;
-	}
-
-}
 
 }

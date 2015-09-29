@@ -35,27 +35,22 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         int mineReward = this.domain.getMineVal();
         int noBudgetReward = this.domain.getNoBudgetVal();
         
-        //System.out.println("s: " + s.getCompleteStateDescription());
-        //System.out.println("sprime: " + sprime.getCompleteStateDescription());
+        System.out.println("s: " + s.getCompleteStateDescription());
+        System.out.println("sprime: " + sprime.getCompleteStateDescription());
         
         boolean c1 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
         boolean c2 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
-        int budgs = s.getFirstObjectOfClass("agent").getIntValForAttribute("budget");
         
         boolean c1p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
         boolean c2p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
-        int budgsp = sprime.getFirstObjectOfClass("agent").getIntValForAttribute("budget");
         
-        //System.out.println(budgs + " " + budgsp);
-
-//        if(budgsp == 0){
-//            System.exit(0);
-//        }
         
         //System.out.println("Reward at: " + x + ", " + y);
         
         if( this.domain.getNoBudgetTransition() ){
+            System.out.println("UniformCostPlusMines::reward. returning noBudgetReward");
             this.domain.noBudgetTransition = false;
+            domain.updateBudget(noBudgetReward, sprime);
             return noBudgetReward;
         }
         
@@ -76,7 +71,7 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         //System.out.println("Verify mines: ");
         for (String m : mineCoordinates.keySet()) {
             if (mineCoordinates.get(m)[0] == x && mineCoordinates.get(m)[1] == y) {
-                //System.out.println("Mine found... " + x + "," + y + " " + mineReward);
+                System.out.println("UniformCostPlusMinesRF::reward. Mine found... " + x + "," + y + " " + mineReward);
                 domain.updateBudget(mineReward, sprime);
                 return mineReward;
             }

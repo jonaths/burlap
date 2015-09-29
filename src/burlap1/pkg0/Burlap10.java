@@ -6,9 +6,6 @@
 package burlap1.pkg0;
 
 import burlap.MineWorldDomain;
-import burlap.MineWorldDomain.NoBudgetTF;
-import java.awt.Color;
-import java.util.List;
 
 import burlap.behavior.singleagent.*;
 import burlap.domain.singleagent.gridworld.*;
@@ -19,27 +16,16 @@ import burlap.behavior.statehashing.DiscreteStateHashFactory;
 import burlap.behavior.singleagent.learning.*;
 import burlap.behavior.singleagent.learning.tdmethods.*;
 import burlap.behavior.singleagent.planning.*;
-import burlap.behavior.singleagent.planning.commonpolicies.GreedyQPolicy;
 import burlap.behavior.singleagent.planning.deterministic.*;
-import burlap.behavior.singleagent.planning.deterministic.informed.Heuristic;
-import burlap.behavior.singleagent.planning.deterministic.informed.astar.AStar;
-import burlap.behavior.singleagent.planning.deterministic.uninformed.bfs.BFS;
-import burlap.behavior.singleagent.planning.deterministic.uninformed.dfs.DFS;
-import burlap.behavior.singleagent.planning.stochastic.valueiteration.ValueIteration;
 import burlap.oomdp.visualizer.Visualizer;
 import burlap.oomdp.auxiliary.StateGenerator;
 import burlap.oomdp.auxiliary.StateParser;
 import burlap.oomdp.auxiliary.common.ConstantStateGenerator;
 import burlap.behavior.singleagent.EpisodeSequenceVisualizer;
-import burlap.behavior.singleagent.auxiliary.StateReachability;
 import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
 import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
 import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
-import burlap.behavior.singleagent.auxiliary.valuefunctionvis.ValueFunctionVisualizerGUI;
-import burlap.behavior.singleagent.auxiliary.valuefunctionvis.common.*;
-import burlap.behavior.singleagent.auxiliary.valuefunctionvis.common.PolicyGlyphPainter2D.PolicyGlyphRenderStyle;
 import burlap.oomdp.singleagent.common.VisualActionObserver;
-import java.util.Arrays;
 
 /**
  *
@@ -83,11 +69,7 @@ public class Burlap10 {
         rf = new UniformCostPlusMinesRF(gwdg);
         
         //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
-        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINS));
-        
-        TerminalFunction tff = new NoBudgetTF(true);
-        
-        //nobudgetTF = new NoBudgetPFTF(domain.getPropFunction(MineWorldDomain.PFNOBUDGET));
+        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINSORNOBUDGET));
         
         goalCondition = new TFGoalCondition(tf);
 
@@ -116,6 +98,8 @@ public class Burlap10 {
     }
 
     public void QLearningExample(String outputPath) {
+        
+        
 
         if (!outputPath.endsWith("/")) {
             outputPath = outputPath + "/";
@@ -126,9 +110,14 @@ public class Burlap10 {
 
         //run learning for 100 episodes
         for (int i = 0; i < 100; i++) {
+            int totalReward = 0;
             EpisodeAnalysis ea = agent.runLearningEpisodeFrom(initialState);
             ea.writeToFile(String.format("%se%03d", outputPath, i), sp);
-            System.out.println("STEPS " + i + " "  + ea.numTimeSteps() + " " + gwdg.calculateBudgetState());
+            
+            for(int j = 1; j < ea.numTimeSteps() ; j++){
+                totalReward += ea.getReward(j);
+            }
+            System.out.println(" Step: " + i + " Timesteps: " + ea.numTimeSteps() + " Reward: " + totalReward);
         }
 
     }
