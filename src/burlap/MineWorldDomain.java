@@ -96,6 +96,7 @@ public class MineWorldDomain extends GridWorldDomain {
         new MovementAction(ACTIONWEST, domain, this.transitionDynamics[3], cmap);
 
         new AtLocationPF(PFATLOCATION, domain, new String[]{CLASSAGENT, CLASSLOCATION});
+        new HasAllCoinsOrNoBudgetPF(PFHASALLCOINSORNOBUDGET, domain, new String[]{CLASSAGENT, CLASSLOCATION});
 
         new WallToPF(PFWALLNORTH, domain, new String[]{CLASSAGENT}, 0);
         new WallToPF(PFWALLSOUTH, domain, new String[]{CLASSAGENT}, 1);
