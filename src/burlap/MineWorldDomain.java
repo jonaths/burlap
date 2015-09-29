@@ -24,6 +24,7 @@ import burlap.oomdp.core.Attribute;
 import burlap.oomdp.core.Domain;
 import burlap.oomdp.core.ObjectClass;
 import burlap.oomdp.core.ObjectInstance;
+import burlap.oomdp.core.PropositionalFunction;
 import burlap.oomdp.core.State;
 import burlap.oomdp.singleagent.SADomain;
 import java.util.HashMap;
@@ -295,5 +296,42 @@ public class MineWorldDomain extends GridWorldDomain {
         this.budget += update;
         return this.budget;
     }
+    
+public class HasAllCoinsOrNoBudgetPF extends PropositionalFunction {
+
+        /**
+         * Initializes with given name domain and parameter object class types
+         *
+         * @param name name of function
+         * @param domain the domain of the function
+         * @param parameterClasses the object class types for the parameters
+         */
+        public HasAllCoinsOrNoBudgetPF(String name, Domain domain, String[] parameterClasses) {
+            super(name, domain, parameterClasses);
+        }
+
+        @Override
+        public boolean isTrue(State st, String[] params) {
+
+            ObjectInstance agent = st.getObject(params[0]);
+            
+            boolean c1 = agent.getBooleanValForAttribute("c1");
+            boolean c2 = agent.getBooleanValForAttribute("c2");
+            int budgs = agent.getIntValForAttribute("budget");
+            
+//            System.out.println(c1 + " " + c2 + " " + (budgs == 0));
+//            System.out.println(c1 && c2);
+//            System.out.println(budgs == 0);
+//            System.exit(0);
+
+            if((c1 && c2) || (budgs == 0)){
+                System.out.println("HasAllCoinsPF::isTrue. Coins: "+(c1 && c2)+" Budgs: "+(budgs == 0)+" Ending... ");
+                return true;
+            }
+            return false;
+        }
+
+    }
+    
 
 }
