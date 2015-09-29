@@ -25,7 +25,10 @@ import burlap.behavior.singleagent.EpisodeSequenceVisualizer;
 import burlap.behavior.singleagent.auxiliary.performance.LearningAlgorithmExperimenter;
 import burlap.behavior.singleagent.auxiliary.performance.PerformanceMetric;
 import burlap.behavior.singleagent.auxiliary.performance.TrialMode;
+import burlap.behavior.statehashing.DiscreteMaskHashingFactory;
 import burlap.oomdp.singleagent.common.VisualActionObserver;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -65,21 +68,23 @@ public class Burlap10 {
 
         //define the task
         
-        // rf = new UniformCostRF();
+//         rf = new UniformCostRF();
         rf = new UniformCostPlusMinesRF(gwdg);
         
-        //tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
-        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINSORNOBUDGET));
+        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFATLOCATION));
+//        tf = new SinglePFTF(domain.getPropFunction(MineWorldDomain.PFHASALLCOINSORNOBUDGET));
         
         goalCondition = new TFGoalCondition(tf);
 
         //set up the initial state of the task
         initialState = MineWorldDomain.getOneAgentOneLocationState(domain);
-        MineWorldDomain.setAgent(initialState, 0, 0);
-        MineWorldDomain.setLocation(initialState, 0, 10, 10);
+        gwdg.setMWDAgent(initialState, 0, 0, 20);
+        gwdg.setMWDLocation(initialState, 0, 10, 10);
+        
+        List<Attribute> toObserve = new ArrayList<>();
 
         //set up the state hashing system
-        hashingFactory = new DiscreteStateHashFactory();
+        hashingFactory = new DiscreteMaskHashingFactory();
         hashingFactory.setAttributesForClass(MineWorldDomain.CLASSAGENT,
                 domain.getObjectClass(MineWorldDomain.CLASSAGENT).attributeList);
 
