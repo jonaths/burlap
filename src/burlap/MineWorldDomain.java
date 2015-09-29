@@ -248,17 +248,13 @@ public class MineWorldDomain extends GridWorldDomain {
         ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
         
         int budgetStateBefore = agent.getIntValForAttribute(BUDGET);
-        System.out.println("MineWorldDomain::updateBudgetState. before update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
+        System.out.println("MineWorldDomain::updateBudgetState. before update budget: "+this.getBudget()+" "+budgetStateBefore);
         
         agent.setValue(BUDGET, this.calculateBudgetState());
         
         int budgetStateAfter = agent.getIntValForAttribute(BUDGET);
-        System.out.println("MineWorldDomain::updateBudgetState. after update budget: "+this.getBudget()+" "+agent.getIntValForAttribute(BUDGET));
-        
-        if( (budgetStateBefore == 1) && (budgetStateAfter == 0) ){
-            System.out.println("MineWorldDomain::updateBudgetState. No budget transition!!! ");
-            this.noBudgetTransition = true;
-        }
+        System.out.println("MineWorldDomain::updateBudgetState. after update budget: "+this.getBudget()+" "+budgetStateAfter);
+     
     }
     
     public int calculateBudgetState(){

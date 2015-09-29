@@ -43,12 +43,12 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         
         boolean c1p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
         boolean c2p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
-        
+        int budgetp = sprime.getFirstObjectOfClass("agent").getIntValForAttribute("budget");
         
         //System.out.println("Reward at: " + x + ", " + y);
         
-        if( this.domain.getNoBudgetTransition() ){
-            System.out.println("UniformCostPlusMines::reward. returning noBudgetReward");
+        if( budgetp == 0 ){
+            System.out.println("UniformCostPlusMines::reward. returning ");
             this.domain.noBudgetTransition = false;
             domain.updateBudget(noBudgetReward, sprime);
             return noBudgetReward;
