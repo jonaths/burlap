@@ -24,21 +24,32 @@ public class UniformCostPlusMinesRF implements RewardFunction {
     @Override
     public double reward(State s, GroundedAction a, State sprime) {
         
+//        System.out.println("s: " + s.getCompleteStateDescription());
+//        System.out.println("sprime: " + sprime.getCompleteStateDescription());        
+        
         int reward;
         boolean isMine = false;
+        boolean isCoin = false;
 
         // Recupera posiciones de minas y monedas
         HashMap<String, Integer[]> coinCoordinates = this.domain.getCoinCoordinates();
         HashMap<String, Integer[]> mineCoordinates = this.domain.getMineCoordinates();
-        
-        // Recupera valores actuales de posicion del agente
+//        
+//        // Recupera valores actuales del agente
         int x = sprime.getFirstObjectOfClass("agent").getIntValForAttribute("x");
         int y = sprime.getFirstObjectOfClass("agent").getIntValForAttribute("y");        
-        
-        // Recupera recompensas de minas y monedas. 
+        boolean c1 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
+        boolean c2 = s.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");
+
+        // Recupera valores anteriores del agente
+        boolean c1p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c1");
+        boolean c2p = sprime.getFirstObjectOfClass("agent").getBooleanValForAttribute("c2");        
+//
+//        
+//        // Recupera recompensas de minas y monedas. 
         int coinReward = this.domain.getCoinVal();
         int mineReward = this.domain.getMineVal();        
-        
+//        
         for (String m : mineCoordinates.keySet()) {
             if (mineCoordinates.get(m)[0] == x && mineCoordinates.get(m)[1] == y) {
                 System.out.println("UniformCostPlusMinesRF::reward. Mine found... " + x + "," + y + " " + mineReward);
@@ -46,15 +57,30 @@ public class UniformCostPlusMinesRF implements RewardFunction {
             }
         }        
         
+        if((c1 ^ c1p) || (c2 ^ c2p)){
+            System.out.println("Coin found... " + x + "," + y + " " + mineReward);
+            // Si se han encontrado las dos monedas resetea el budget
+            if( c1p && c2p ){
+            // domain.resetBudget(sprime);
+            }
+            // Regresa la recompensa de moneda
+            isCoin = true;
+        }        
+        
         if(isMine){
             reward = mineReward;
+        }
+        else if(isCoin){
+            reward = coinReward;
         }
         else{
             reward = -1;
         }
         
+//        reward = -1;
+        
         domain.updateBudget(reward);
-        return -reward;
+        return reward;
         
         
         

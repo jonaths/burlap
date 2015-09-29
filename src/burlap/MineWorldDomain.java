@@ -206,8 +206,8 @@ public class MineWorldDomain extends GridWorldDomain {
         Integer[] coinCoordinates1 = {1, 2};
         Integer[] coinCoordinates2 = {3, 3};
 
-        Integer[] mineCoordinates1 = {5, 5};
-        Integer[] mineCoordinates2 = {7, 7};
+        Integer[] mineCoordinates1 = {8, 1};
+        Integer[] mineCoordinates2 = {8, 2};
 
         this.coins.put(C1, coinCoordinates1);
         this.coins.put(C2, coinCoordinates2);
@@ -255,7 +255,7 @@ public class MineWorldDomain extends GridWorldDomain {
         // Verifica si encontró una moneda
         for (String m : coinCoordinates.keySet()) {
             if (coinCoordinates.get(m)[0] == nx && coinCoordinates.get(m)[1] == ny) {
-                //System.out.println("Found coin: " + m + " at " + nx + "," + ny);
+                //System.out.println("MineWorldDomain::move. Found coin: " + m + " at " + nx + "," + ny);
                 foundCoinFlag = true;
                 agent.setValue(m, 1);
                 //System.out.println(agent.getObjectDescription());
