@@ -46,6 +46,8 @@ public class MineWorldDomain extends GridWorldDomain {
     public int coinVal;
     public int mineVal;
     public int budget;
+    boolean noBudgetFlag = false;
+    public int initialBudget;
 
     public MineWorldDomain(int width, int height) {
         super(width, height);
@@ -117,6 +119,7 @@ public class MineWorldDomain extends GridWorldDomain {
      */
     public void setMWDAgent(State s, int x, int y, int budget) {
         ObjectInstance o = s.getObjectsOfClass(CLASSAGENT).get(0);
+        this.initialBudget = budget;
 
         o.setValue(ATTX, x);
         o.setValue(ATTY, y);
@@ -127,7 +130,7 @@ public class MineWorldDomain extends GridWorldDomain {
         setBudgetState(o);
         
 
-        System.out.println(o.getObjectDescription() + "Budget: " + this.getBudget());
+        //System.out.println(o.getObjectDescription() + "Budget: " + this.getBudget());
         //System.exit(0);
     }
 
@@ -162,7 +165,7 @@ public class MineWorldDomain extends GridWorldDomain {
         int budgetState = setBudgetState(o);
         if(budgetState == 1){
             
-            System.out.println(s.getCompleteStateDescription());
+            //System.out.println(s.getCompleteStateDescription());
             //System.exit(0);
         }
         return budgetState;
@@ -217,9 +220,9 @@ public class MineWorldDomain extends GridWorldDomain {
         this.mines = new HashMap<>();
 
         Integer[] coinCoordinates1 = {1, 2};
-        Integer[] coinCoordinates2 = {10, 10};
+        Integer[] coinCoordinates2 = {1, 5};
 
-        Integer[] mineCoordinates1 = {5, 5};
+        Integer[] mineCoordinates1 = {1, 3};
         Integer[] mineCoordinates2 = {5, 3};
 
         this.coins.put(C1, coinCoordinates1);
@@ -242,13 +245,22 @@ public class MineWorldDomain extends GridWorldDomain {
      */
     protected void move(State s, int xd, int yd, int[][] map) {
         
+        ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
+        
+        if(noBudgetFlag){
+            agent.setValue(NB, 0);
+            this.budget = 20;
+            //System.out.println("s: " + s.getCompleteStateDescription());
+            //System.exit(0);
+        }
+        
         this.setBudgetState(s,0);
-        System.out.println("s: " + s.getCompleteStateDescription());
+        
 
         boolean foundCoinFlag = false;
-        boolean noBudgetFlag = false;
+        
 
-        ObjectInstance agent = s.getObjectsOfClass(CLASSAGENT).get(0);
+        
         int ax = agent.getIntValForAttribute(ATTX);
         int ay = agent.getIntValForAttribute(ATTY);
 
@@ -282,7 +294,7 @@ public class MineWorldDomain extends GridWorldDomain {
         if (foundCoinFlag && (this.getBudget() + this.getCoinVal()) >= 0) {
             noBudgetFlag = false;
         } else if ((this.getBudget() - 1) <= 0) {
-            System.out.println("MineWorldDomain::move. noBudgetFlag is true. Budget: " + (this.getBudget()-1));
+            //System.out.println("MineWorldDomain::move. noBudgetFlag is true. Budget: " + (this.getBudget()-1));
             noBudgetFlag = true;
             agent.setValue(NB, 1);
             //System.exit(0);
@@ -343,8 +355,9 @@ public class HasAllCoinsOrNoBudgetPF extends PropositionalFunction {
 //            System.exit(0);
 
             if((c1 && c2) || nb){
-                System.out.println("HasAllCoinsPF::isTrue. coins: " + (c1 && c2)+", nb: " + nb + " Ending... ");
-                System.out.println("HasAllCoinsPF::isTrue. description: " + st.getCompleteStateDescription());
+                //System.out.println("HasAllCoinsPF::isTrue. coins: " + (c1 && c2)+", nb: " + nb + " Ending... ");
+                //System.out.println("HasAllCoinsPF::isTrue. description: " + st.getCompleteStateDescription());
+                
                 return true;
             }
             return false;

@@ -45,6 +45,7 @@ public class Burlap10 {
     StateConditionTest goalCondition;
     State initialState;
     DiscreteStateHashFactory hashingFactory;
+    int initialBudget;
 
     public static void main(String[] args) {
         Burlap10 example = new Burlap10();

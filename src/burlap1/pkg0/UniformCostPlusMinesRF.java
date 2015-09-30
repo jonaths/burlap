@@ -52,16 +52,16 @@ public class UniformCostPlusMinesRF implements RewardFunction {
 //        
         for (String m : mineCoordinates.keySet()) {
             if (mineCoordinates.get(m)[0] == x && mineCoordinates.get(m)[1] == y) {
-                System.out.println("UniformCostPlusMinesRF::reward. Mine found... " + x + "," + y + " " + mineReward);
+                //System.out.println("UniformCostPlusMinesRF::reward. Mine found... " + x + "," + y + " " + mineReward);
                 isMine = true;
             }
         }        
         
         if((c1 ^ c1p) || (c2 ^ c2p)){
-            System.out.println("Coin found... " + x + "," + y + " " + mineReward);
+            //System.out.println("UniformCostPlusMines::reward. Coin found... " + x + "," + y + " " + mineReward);
             // Si se han encontrado las dos monedas resetea el budget
             if( c1p && c2p ){
-                domain.budget = 20;
+                domain.budget = domain.initialBudget;
                 domain.setBudgetState(s, 0);
             }
             // Regresa la recompensa de moneda
@@ -82,9 +82,8 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         
 //        System.out.println("s: " + s.getCompleteStateDescription());
 //        System.out.println("sprime: " + sprime.getCompleteStateDescription()); 
-//        System.exit(0);
         
-        System.out.println("UniformCostPlusMines::reward. Reward: "+reward + " Budget: " + domain.getBudget());
+        //System.out.println("UniformCostPlusMines::reward. Reward: "+reward + " Budget: " + domain.getBudget());
         
         return reward;
         
