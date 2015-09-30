@@ -123,10 +123,12 @@ public class MineWorldDomain extends GridWorldDomain {
         o.setValue(C1, 0);
         o.setValue(C2, 0);
         o.setValue(NB, 0);
-        setBudgetState(o, budget);
         this.budget = budget;
+        setBudgetState(o);
+        
 
-        //System.out.println(o.getObjectDescription());
+        System.out.println(o.getObjectDescription() + "Budget: " + this.getBudget());
+        //System.exit(0);
     }
 
     /**
@@ -154,9 +156,16 @@ public class MineWorldDomain extends GridWorldDomain {
      * @param budget
      * @return
      */
-    public int setBudgetState(State s, int i, int budget) {
-        ObjectInstance o = s.getObjectsOfClass(CLASSLOCATION).get(i);
-        return setBudgetState(o, budget);
+    public int setBudgetState(State s, int i) {
+        ObjectInstance o = s.getObjectsOfClass(CLASSAGENT).get(i);
+//        System.out.println(s.getCompleteStateDescription());
+        int budgetState = setBudgetState(o);
+        if(budgetState == 1){
+            
+            System.out.println(s.getCompleteStateDescription());
+            //System.exit(0);
+        }
+        return budgetState;
 
     }
 
@@ -167,8 +176,9 @@ public class MineWorldDomain extends GridWorldDomain {
      * @param budget
      * @return
      */
-    public int setBudgetState(ObjectInstance o, int budget) {
-        o.setValue(BUDGETSTATE, calculateBudgetState(budget));
+    public int setBudgetState(ObjectInstance o) {
+        int budgetState = calculateBudgetState();
+        o.setValue(BUDGETSTATE, budgetState);
         return o.getDiscValForAttribute(BUDGETSTATE);
     }
 
@@ -178,17 +188,17 @@ public class MineWorldDomain extends GridWorldDomain {
      * @param budget
      * @return
      */
-    public int calculateBudgetState(int budget) {
-        if (budget <= 0) {
+    public int calculateBudgetState() {
+        if (this.budget <= 0) {
             return 0;
         }
-        if (budget > 0 && budget <= 10) {
+        if (this.budget > 0 && this.budget <= 10) {
             return 1;
         }
-        if (budget > 10 && budget <= 20) {
+        if (this.budget > 10 && this.budget <= 20) {
             return 2;
         }
-        if (budget > 20) {
+        if (this.budget > 20) {
             return 3;
         }
         // Si es cualquier otro número regresa -1 (error)
@@ -207,10 +217,10 @@ public class MineWorldDomain extends GridWorldDomain {
         this.mines = new HashMap<>();
 
         Integer[] coinCoordinates1 = {1, 2};
-        Integer[] coinCoordinates2 = {3, 3};
+        Integer[] coinCoordinates2 = {10, 10};
 
-        Integer[] mineCoordinates1 = {8, 1};
-        Integer[] mineCoordinates2 = {8, 2};
+        Integer[] mineCoordinates1 = {5, 5};
+        Integer[] mineCoordinates2 = {5, 3};
 
         this.coins.put(C1, coinCoordinates1);
         this.coins.put(C2, coinCoordinates2);
@@ -231,6 +241,9 @@ public class MineWorldDomain extends GridWorldDomain {
      * @param yd the attempted new Y position of the agent
      */
     protected void move(State s, int xd, int yd, int[][] map) {
+        
+        this.setBudgetState(s,0);
+        System.out.println("s: " + s.getCompleteStateDescription());
 
         boolean foundCoinFlag = false;
         boolean noBudgetFlag = false;
@@ -268,10 +281,13 @@ public class MineWorldDomain extends GridWorldDomain {
         // Verifica si se va a quedar sin presupuesto
         if (foundCoinFlag && (this.getBudget() + this.getCoinVal()) >= 0) {
             noBudgetFlag = false;
-        } else if ((this.getCoinVal() - 1) <= 0) {
+        } else if ((this.getBudget() - 1) <= 0) {
+            System.out.println("MineWorldDomain::move. noBudgetFlag is true. Budget: " + (this.getBudget()-1));
             noBudgetFlag = true;
             agent.setValue(NB, 1);
+            //System.exit(0);
         }
+        //System.out.println("s: " + s.getCompleteStateDescription());
     }
 
     public HashMap<String, Integer[]> getCoinCoordinates() {
@@ -328,6 +344,7 @@ public class HasAllCoinsOrNoBudgetPF extends PropositionalFunction {
 
             if((c1 && c2) || nb){
                 System.out.println("HasAllCoinsPF::isTrue. coins: " + (c1 && c2)+", nb: " + nb + " Ending... ");
+                System.out.println("HasAllCoinsPF::isTrue. description: " + st.getCompleteStateDescription());
                 return true;
             }
             return false;

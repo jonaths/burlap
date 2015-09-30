@@ -61,7 +61,8 @@ public class UniformCostPlusMinesRF implements RewardFunction {
             System.out.println("Coin found... " + x + "," + y + " " + mineReward);
             // Si se han encontrado las dos monedas resetea el budget
             if( c1p && c2p ){
-            // domain.resetBudget(sprime);
+                domain.budget = 20;
+                domain.setBudgetState(s, 0);
             }
             // Regresa la recompensa de moneda
             isCoin = true;
@@ -76,23 +77,16 @@ public class UniformCostPlusMinesRF implements RewardFunction {
         else{
             reward = -1;
         }
-        
-//        reward = -1;
-        
         domain.updateBudget(reward);
+        
+        
+//        System.out.println("s: " + s.getCompleteStateDescription());
+//        System.out.println("sprime: " + sprime.getCompleteStateDescription()); 
+//        System.exit(0);
+        
+        System.out.println("UniformCostPlusMines::reward. Reward: "+reward + " Budget: " + domain.getBudget());
+        
         return reward;
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
 //        HashMap<String, Integer[]> coinCoordinates = this.domain.getCoinCoordinates();
